@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SHJ.Toolkits.Strings;
+﻿namespace SHJ.Toolkits.Strings;
 
 
 /// <summary>
@@ -150,13 +144,4 @@ public static class LocalicationStringExtensions
     public static string ToUnderscoreCase(this string input) =>
         string.Concat(input.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
 
-    public static byte[] ToByteArray(this string input)
-    {
-        return System.Text.Encoding.UTF8.GetBytes(input);
-    }
-
-    public static string FromByteArray(this byte[] input)
-    {
-        return System.Text.Encoding.UTF8.GetString(input);
-    }
 }

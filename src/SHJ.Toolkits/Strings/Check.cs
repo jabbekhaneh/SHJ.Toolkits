@@ -1,4 +1,6 @@
 ﻿using JetBrains.Annotations;
+using SHJ.Toolkits.System;
+
 namespace SHJ.Toolkits.Strings;
 
 
