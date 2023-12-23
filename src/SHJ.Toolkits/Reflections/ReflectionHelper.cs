@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace SHJ.Toolkits.Reflections;
@@ -79,7 +80,6 @@ public static class ReflectionHelper
 
     public static bool IsCustomType(this Type type)
     {
-        //return type.Assembly.GetName().Name != "mscorlib";
         return type.IsCustomValueType() || type.IsCustomReferenceType();
     }
 
@@ -91,5 +91,9 @@ public static class ReflectionHelper
     public static bool IsCustomReferenceType(this Type type)
     {
         return !type.IsValueType && !type.IsPrimitive && type.Namespace != null && !type.Namespace.StartsWith("System", StringComparison.Ordinal);
+    }
+    public static string GetFileVersion(this Assembly assembly)
+    {
+        return FileVersionInfo.GetVersionInfo(assembly.Location).FileVersion!;
     }
 }

@@ -1,158 +1,592 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using JetBrains.Annotations;
+using SHJ.Toolkits.Collection;
+using System.Globalization;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace SHJ.Toolkits.Strings;
 
+/// <summary>
+/// Extension methods for String class.
+/// </summary>
 public static class StringExtensions
 {
-    public const char ArabicYeChar = (char)1610;
-    public const char PersianYeChar = (char)1740;
-    public const char ArabicKeChar = (char)1603;
-    public const char PersianKeChar = (char)1705;
+    /// <summary>
+    /// Adds a char to end of given string if it does not ends with the char.
+    /// </summary>
+    public static string EnsureEndsWith(this string str, char c, StringComparison comparisonType = StringComparison.Ordinal)
+    {
+        Check.NotNull(str, nameof(str));
 
+        if (str.EndsWith(c.ToString(), comparisonType))
+        {
+            return str;
+        }
+
+        return str + c;
+    }
 
     /// <summary>
-    ///  Separate three digits
+    /// Adds a char to beginning of given string if it does not starts with the char.
     /// </summary>
-    /// <param name="value">123456</param>
-    /// <returns>"123,456"</returns>
-    public static string ToNumeric(this int value)
+    public static string EnsureStartsWith(this string str, char c, StringComparison comparisonType = StringComparison.Ordinal)
     {
-        return value.ToString("N0"); //"123,456"
-    }
-    public static decimal ToDecimal(this string value)
-    {
-        return Convert.ToDecimal(value);
-    }
+        Check.NotNull(str, nameof(str));
 
+        if (str.StartsWith(c.ToString(), comparisonType))
+        {
+            return str;
+        }
 
-    public static bool HasValue(this string value, bool ignoreWhiteSpace = true)
-    {
-        return ignoreWhiteSpace ? !string.IsNullOrWhiteSpace(value) : !string.IsNullOrEmpty(value);
+        return c + str;
     }
 
-    public static int ToInt(this string value)
+    /// <summary>
+    /// Indicates whether this string is null or an System.String.Empty string.
+    /// </summary>
+    [ContractAnnotation("str:null => true")]
+    public static bool IsNullOrEmpty(this string? str)
     {
-        return Convert.ToInt32(value);
+        return string.IsNullOrEmpty(str);
     }
 
-
-
-    public static string ToNumeric(this decimal value)
+    /// <summary>
+    /// indicates whether this string is null, empty, or consists only of white-space characters.
+    /// </summary>
+    [ContractAnnotation("str:null => true")]
+    public static bool IsNullOrWhiteSpace(this string? str)
     {
-        return value.ToString("N0");
+        return string.IsNullOrWhiteSpace(str);
     }
 
-    public static string ToCurrency(this int value)
+    /// <summary>
+    /// Gets a substring of a string from beginning of the string.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="str"/> is null</exception>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="len"/> is bigger that string's length</exception>
+    public static string Left(this string str, int len)
     {
-        //fa-IR => current culture currency symbol => ریال
-        //123456 => "123,123ریال"
-        return value.ToString("C0");
+        Check.NotNull(str, nameof(str));
+
+        if (str.Length < len)
+        {
+            throw new ArgumentException("len argument can not be bigger than given string's length!");
+        }
+
+        return str.Substring(0, len);
     }
 
-    public static string ToCurrency(this decimal value)
+    /// <summary>
+    /// Converts line endings in the string to <see cref="Environment.NewLine"/>.
+    /// </summary>
+    public static string NormalizeLineEndings(this string str)
     {
-        return value.ToString("C0");
+        return str.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine);
     }
 
-    public static string En2Fa(this string str)
+    /// <summary>
+    /// Gets index of nth occurrence of a char in a string.
+    /// </summary>
+    /// <param name="str">source string to be searched</param>
+    /// <param name="c">Char to search in <paramref name="str"/></param>
+    /// <param name="n">Count of the occurrence</param>
+    public static int NthIndexOf(this string str, char c, int n)
     {
-        return str.Replace("0", "۰")
-            .Replace("1", "۱")
-            .Replace("2", "۲")
-            .Replace("3", "۳")
-            .Replace("4", "۴")
-            .Replace("5", "۵")
-            .Replace("6", "۶")
-            .Replace("7", "۷")
-            .Replace("8", "۸")
-            .Replace("9", "۹");
+        Check.NotNull(str, nameof(str));
+
+        var count = 0;
+        for (var i = 0; i < str.Length; i++)
+        {
+            if (str[i] != c)
+            {
+                continue;
+            }
+
+            if ((++count) == n)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
-    public static string Fa2En(this string str)
+    /// <summary>
+    /// Removes first occurrence of the given postfixes from end of the given string.
+    /// </summary>
+    /// <param name="str">The string.</param>
+    /// <param name="postFixes">one or more postfix.</param>
+    /// <returns>Modified string or the same string if it has not any of given postfixes</returns>
+    [ContractAnnotation("null <= str:null")]
+    public static string RemovePostFix(this string str, params string[] postFixes)
     {
-        return str.Replace("۰", "0")
-            .Replace("۱", "1")
-            .Replace("۲", "2")
-            .Replace("۳", "3")
-            .Replace("۴", "4")
-            .Replace("۵", "5")
-            .Replace("۶", "6")
-            .Replace("۷", "7")
-            .Replace("۸", "8")
-            .Replace("۹", "9")
-            //iphone numeric
-            .Replace("٠", "0")
-            .Replace("١", "1")
-            .Replace("٢", "2")
-            .Replace("٣", "3")
-            .Replace("٤", "4")
-            .Replace("٥", "5")
-            .Replace("٦", "6")
-            .Replace("٧", "7")
-            .Replace("٨", "8")
-            .Replace("٩", "9");
+        return str.RemovePostFix(StringComparison.Ordinal, postFixes);
     }
 
-    public static string FixPersianChars(this string str)
+    /// <summary>
+    /// Removes first occurrence of the given postfixes from end of the given string.
+    /// </summary>
+    /// <param name="str">The string.</param>
+    /// <param name="comparisonType">String comparison type</param>
+    /// <param name="postFixes">one or more postfix.</param>
+    /// <returns>Modified string or the same string if it has not any of given postfixes</returns>
+    [ContractAnnotation("null <= str:null")]
+    public static string RemovePostFix(this string str, StringComparison comparisonType, params string[] postFixes)
     {
-        return str.Replace("ﮎ", "ک")
-            .Replace("ﮏ", "ک")
-            .Replace("ﮐ", "ک")
-            .Replace("ﮑ", "ک")
-            .Replace("ك", "ک")
-            .Replace("ي", "ی")
-            .Replace(" ", " ")
-            .Replace("‌", " ")
-            .Replace("ھ", "ه");//.Replace("ئ", "ی");
+        if (str.IsNullOrEmpty())
+        {
+            return str;
+        }
+
+        if (postFixes.IsNullOrEmpty())
+        {
+            return str;
+        }
+
+        foreach (var postFix in postFixes)
+        {
+            if (str.EndsWith(postFix, comparisonType))
+            {
+                return str.Left(str.Length - postFix.Length);
+            }
+        }
+
+        return str;
     }
 
-    public static string CleanString(this string str)
+    /// <summary>
+    /// Removes first occurrence of the given prefixes from beginning of the given string.
+    /// </summary>
+    /// <param name="str">The string.</param>
+    /// <param name="preFixes">one or more prefix.</param>
+    /// <returns>Modified string or the same string if it has not any of given prefixes</returns>
+    [ContractAnnotation("null <= str:null")]
+    public static string RemovePreFix(this string str, params string[] preFixes)
     {
-        return str.Trim().FixPersianChars().Fa2En().NullIfEmpty();
+        return str.RemovePreFix(StringComparison.Ordinal, preFixes);
     }
 
-    public static string NullIfEmpty(this string str)
+    /// <summary>
+    /// Removes first occurrence of the given prefixes from beginning of the given string.
+    /// </summary>
+    /// <param name="str">The string.</param>
+    /// <param name="comparisonType">String comparison type</param>
+    /// <param name="preFixes">one or more prefix.</param>
+    /// <returns>Modified string or the same string if it has not any of given prefixes</returns>
+    [ContractAnnotation("null <= str:null")]
+    public static string RemovePreFix(this string str, StringComparison comparisonType, params string[] preFixes)
     {
-        return str?.Length == 0 ? null : str;
-    }
-    public static string ApplyCorrectYeKe(this object data)
-    {
-        return data == null ? null : ApplyCorrectYeKe(data.ToString());
-    }
+        if (str.IsNullOrEmpty())
+        {
+            return str;
+        }
 
-    public static string ApplyCorrectYeKe(this string data)
-    {
-        return string.IsNullOrWhiteSpace(data) ?
-                    string.Empty :
-                    data.Replace(ArabicYeChar, PersianYeChar).Replace(ArabicKeChar, PersianKeChar).Trim();
-    }
-    public static long ToSafeLong(this string input, long replacement = long.MinValue) =>
-         long.TryParse(input, out long result) ? result : replacement;
-    public static long? ToSafeNullableLong(this string input) =>
-        long.TryParse(input, out long result) ? result : null;
+        if (preFixes.IsNullOrEmpty())
+        {
+            return str;
+        }
 
+        foreach (var preFix in preFixes)
+        {
+            if (str.StartsWith(preFix, comparisonType))
+            {
+                return str.Right(str.Length - preFix.Length);
+            }
+        }
 
-    public static int ToSafeInt(this string input, int replacement = int.MinValue) =>
-     int.TryParse(input, out int result) ? result : replacement;
-    public static int? ToSafeNullableInt(this string input) =>
-        int.TryParse(input, out int result) ? result : null;
-
-    public static string ToStringOrEmpty(this string? input) => input ?? string.Empty;
-
-    public static string ToUnderscoreCase(this string input) =>
-        string.Concat(input.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
-
-    public static byte[] ToByteArray(this string input)
-    {
-        return System.Text.Encoding.UTF8.GetBytes(input);
+        return str;
     }
 
-    public static string FromByteArray(this byte[] input)
+    public static string ReplaceFirst(this string str, string search, string replace, StringComparison comparisonType = StringComparison.Ordinal)
     {
-        return System.Text.Encoding.UTF8.GetString(input);
+        Check.NotNull(str, nameof(str));
+
+        var pos = str.IndexOf(search, comparisonType);
+        if (pos < 0)
+        {
+            return str;
+        }
+
+        var searchLength = search.Length;
+        var replaceLength = replace.Length;
+        var newLength = str.Length - searchLength + replaceLength;
+
+        Span<char> buffer = newLength <= 1024 ? stackalloc char[newLength] : new char[newLength];
+
+        // Copy the part of the original string before the search term
+        str.AsSpan(0, pos).CopyTo(buffer);
+
+        // Copy the replacement text
+        replace.AsSpan().CopyTo(buffer.Slice(pos));
+
+        // Copy the remainder of the original string
+        str.AsSpan(pos + searchLength).CopyTo(buffer.Slice(pos + replaceLength));
+
+        return buffer.ToString();
+    }
+
+    /// <summary>
+    /// Gets a substring of a string from end of the string.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="str"/> is null</exception>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="len"/> is bigger that string's length</exception>
+    public static string Right(this string str, int len)
+    {
+        Check.NotNull(str, nameof(str));
+
+        if (str.Length < len)
+        {
+            throw new ArgumentException("len argument can not be bigger than given string's length!");
+        }
+
+        return str.Substring(str.Length - len, len);
+    }
+
+    /// <summary>
+    /// Uses string.Split method to split given string by given separator.
+    /// </summary>
+    public static string[] Split(this string str, string separator)
+    {
+        return str.Split(new[] { separator }, StringSplitOptions.None);
+    }
+
+    /// <summary>
+    /// Uses string.Split method to split given string by given separator.
+    /// </summary>
+    public static string[] Split(this string str, string separator, StringSplitOptions options)
+    {
+        return str.Split(new[] { separator }, options);
+    }
+
+    /// <summary>
+    /// Uses string.Split method to split given string by <see cref="Environment.NewLine"/>.
+    /// </summary>
+    public static string[] SplitToLines(this string str)
+    {
+        return str.Split(Environment.NewLine);
+    }
+
+    /// <summary>
+    /// Uses string.Split method to split given string by <see cref="Environment.NewLine"/>.
+    /// </summary>
+    public static string[] SplitToLines(this string str, StringSplitOptions options)
+    {
+        return str.Split(Environment.NewLine, options);
+    }
+
+    /// <summary>
+    /// Converts PascalCase string to camelCase string.
+    /// </summary>
+    /// <param name="str">String to convert</param>
+    /// <param name="useCurrentCulture">set true to use current culture. Otherwise, invariant culture will be used.</param>
+    /// <param name="handleAbbreviations">set true to if you want to convert 'XYZ' to 'xyz'.</param>
+    /// <returns>camelCase of the string</returns>
+    [ContractAnnotation("null <= str:null")]
+    public static string ToCamelCase(this string str, bool useCurrentCulture = false, bool handleAbbreviations = false)
+    {
+        if (string.IsNullOrWhiteSpace(str))
+        {
+            return str;
+        }
+
+        if (str.Length == 1)
+        {
+            return useCurrentCulture ? str.ToLower() : str.ToLowerInvariant();
+        }
+
+        if (handleAbbreviations && IsAllUpperCase(str))
+        {
+            return useCurrentCulture ? str.ToLower() : str.ToLowerInvariant();
+        }
+
+        return (useCurrentCulture ? char.ToLower(str[0]) : char.ToLowerInvariant(str[0])) + str.Substring(1);
+    }
+
+    /// <summary>
+    /// Converts given PascalCase/camelCase string to sentence (by splitting words by space).
+    /// Example: "ThisIsSampleSentence" is converted to "This is a sample sentence".
+    /// </summary>
+    /// <param name="str">String to convert.</param>
+    /// <param name="useCurrentCulture">set true to use current culture. Otherwise, invariant culture will be used.</param>
+    [ContractAnnotation("null <= str:null")]
+    public static string ToSentenceCase(this string str, bool useCurrentCulture = false)
+    {
+        if (string.IsNullOrWhiteSpace(str))
+        {
+            return str;
+        }
+
+        return useCurrentCulture
+            ? Regex.Replace(str, "[a-z][A-Z]", m => m.Value[0] + " " + char.ToLower(m.Value[1]))
+            : Regex.Replace(str, "[a-z][A-Z]", m => m.Value[0] + " " + char.ToLowerInvariant(m.Value[1]));
+    }
+
+    /// <summary>
+    /// Converts given PascalCase/camelCase string to kebab-case.
+    /// </summary>
+    /// <param name="str">String to convert.</param>
+    /// <param name="useCurrentCulture">set true to use current culture. Otherwise, invariant culture will be used.</param>
+    [ContractAnnotation("null <= str:null")]
+    public static string ToKebabCase(this string str, bool useCurrentCulture = false)
+    {
+        if (string.IsNullOrWhiteSpace(str))
+        {
+            return str;
+        }
+
+        str = str.ToCamelCase();
+
+        return useCurrentCulture
+            ? Regex.Replace(str, "[a-z][A-Z]", m => m.Value[0] + "-" + char.ToLower(m.Value[1]))
+            : Regex.Replace(str, "[a-z][A-Z]", m => m.Value[0] + "-" + char.ToLowerInvariant(m.Value[1]));
+    }
+
+    /// <summary>
+    /// Converts given PascalCase/camelCase string to snake case.
+    /// Example: "ThisIsSampleSentence" is converted to "this_is_a_sample_sentence".
+    /// https://github.com/npgsql/npgsql/blob/dev/src/Npgsql/NameTranslation/NpgsqlSnakeCaseNameTranslator.cs#L51
+    /// </summary>
+    /// <param name="str">String to convert.</param>
+    /// <returns></returns>
+    public static string ToSnakeCase(this string str)
+    {
+        if (string.IsNullOrWhiteSpace(str))
+        {
+            return str;
+        }
+
+        var builder = new StringBuilder(str.Length + Math.Min(2, str.Length / 5));
+        var previousCategory = default(UnicodeCategory?);
+
+        for (var currentIndex = 0; currentIndex < str.Length; currentIndex++)
+        {
+            var currentChar = str[currentIndex];
+            if (currentChar == '_')
+            {
+                builder.Append('_');
+                previousCategory = null;
+                continue;
+            }
+
+            var currentCategory = char.GetUnicodeCategory(currentChar);
+            switch (currentCategory)
+            {
+                case UnicodeCategory.UppercaseLetter:
+                case UnicodeCategory.TitlecaseLetter:
+                    if (previousCategory == UnicodeCategory.SpaceSeparator ||
+                        previousCategory == UnicodeCategory.LowercaseLetter ||
+                        previousCategory != UnicodeCategory.DecimalDigitNumber &&
+                        previousCategory != null &&
+                        currentIndex > 0 &&
+                        currentIndex + 1 < str.Length &&
+                        char.IsLower(str[currentIndex + 1]))
+                    {
+                        builder.Append('_');
+                    }
+
+                    currentChar = char.ToLower(currentChar);
+                    break;
+
+                case UnicodeCategory.LowercaseLetter:
+                case UnicodeCategory.DecimalDigitNumber:
+                    if (previousCategory == UnicodeCategory.SpaceSeparator)
+                    {
+                        builder.Append('_');
+                    }
+                    break;
+
+                default:
+                    if (previousCategory != null)
+                    {
+                        previousCategory = UnicodeCategory.SpaceSeparator;
+                    }
+                    continue;
+            }
+
+            builder.Append(currentChar);
+            previousCategory = currentCategory;
+        }
+
+        return builder.ToString();
+    }
+
+    /// <summary>
+    /// Converts string to enum value.
+    /// </summary>
+    /// <typeparam name="T">Type of enum</typeparam>
+    /// <param name="value">String value to convert</param>
+    /// <returns>Returns enum object</returns>
+    public static T ToEnum<T>(this string value)
+        where T : struct
+    {
+        Check.NotNull(value, nameof(value));
+        return (T)Enum.Parse(typeof(T), value);
+    }
+
+    /// <summary>
+    /// Converts string to enum value.
+    /// </summary>
+    /// <typeparam name="T">Type of enum</typeparam>
+    /// <param name="value">String value to convert</param>
+    /// <param name="ignoreCase">Ignore case</param>
+    /// <returns>Returns enum object</returns>
+    public static T ToEnum<T>(this string value, bool ignoreCase)
+        where T : struct
+    {
+        Check.NotNull(value, nameof(value));
+        return (T)Enum.Parse(typeof(T), value, ignoreCase);
+    }
+
+    public static string ToMd5(this string str)
+    {
+        using (var md5 = MD5.Create())
+        {
+            var inputBytes = Encoding.UTF8.GetBytes(str);
+            var hashBytes = md5.ComputeHash(inputBytes);
+
+            var sb = new StringBuilder();
+            foreach (var hashByte in hashBytes)
+            {
+                sb.Append(hashByte.ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Converts camelCase string to PascalCase string.
+    /// </summary>
+    /// <param name="str">String to convert</param>
+    /// <param name="useCurrentCulture">set true to use current culture. Otherwise, invariant culture will be used.</param>
+    /// <returns>PascalCase of the string</returns>
+    [ContractAnnotation("null <= str:null")]
+    public static string ToPascalCase(this string str, bool useCurrentCulture = false)
+    {
+        if (string.IsNullOrWhiteSpace(str))
+        {
+            return str;
+        }
+
+        if (str.Length == 1)
+        {
+            return useCurrentCulture ? str.ToUpper() : str.ToUpperInvariant();
+        }
+
+        return (useCurrentCulture ? char.ToUpper(str[0]) : char.ToUpperInvariant(str[0])) + str.Substring(1);
+    }
+
+    /// <summary>
+    /// Gets a substring of a string from beginning of the string if it exceeds maximum length.
+    /// </summary>
+    [ContractAnnotation("null <= str:null")]
+    public static string? Truncate(this string? str, int maxLength)
+    {
+        if (str == null)
+        {
+            return null;
+        }
+
+        if (str.Length <= maxLength)
+        {
+            return str;
+        }
+
+        return str.Left(maxLength);
+    }
+
+    /// <summary>
+    /// Gets a substring of a string from Ending of the string if it exceeds maximum length.
+    /// </summary>
+    [ContractAnnotation("null <= str:null")]
+    public static string? TruncateFromBeginning(this string? str, int maxLength)
+    {
+        if (str == null)
+        {
+            return null;
+        }
+
+        if (str.Length <= maxLength)
+        {
+            return str;
+        }
+
+        return str.Right(maxLength);
+    }
+
+    /// <summary>
+    /// Gets a substring of a string from beginning of the string if it exceeds maximum length.
+    /// It adds a "..." postfix to end of the string if it's truncated.
+    /// Returning string can not be longer than maxLength.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="str"/> is null</exception>
+    public static string? TruncateWithPostfix(this string? str, int maxLength)
+    {
+        return TruncateWithPostfix(str, maxLength, "...");
+    }
+
+    /// <summary>
+    /// Gets a substring of a string from beginning of the string if it exceeds maximum length.
+    /// It adds given <paramref name="postfix"/> to end of the string if it's truncated.
+    /// Returning string can not be longer than maxLength.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="str"/> is null</exception>
+    [ContractAnnotation("null <= str:null")]
+    public static string? TruncateWithPostfix(this string? str, int maxLength, string postfix)
+    {
+        if (str == null)
+        {
+            return null;
+        }
+
+        if (str == string.Empty || maxLength == 0)
+        {
+            return string.Empty;
+        }
+
+        if (str.Length <= maxLength)
+        {
+            return str;
+        }
+
+        if (maxLength <= postfix.Length)
+        {
+            return postfix.Left(maxLength);
+        }
+
+        return str.Left(maxLength - postfix.Length) + postfix;
+    }
+
+    /// <summary>
+    /// Converts given string to a byte array using <see cref="Encoding.UTF8"/> encoding.
+    /// </summary>
+    public static byte[] GetBytes(this string str)
+    {
+        return str.GetBytes(Encoding.UTF8);
+    }
+
+    /// <summary>
+    /// Converts given string to a byte array using the given <paramref name="encoding"/>
+    /// </summary>
+    public static byte[] GetBytes([NotNull] this string str, [NotNull] Encoding encoding)
+    {
+        Check.NotNull(str, nameof(str));
+        Check.NotNull(encoding, nameof(encoding));
+
+        return encoding.GetBytes(str);
+    }
+
+    private static bool IsAllUpperCase(string input)
+    {
+        for (int i = 0; i < input.Length; i++)
+        {
+            if (Char.IsLetter(input[i]) && !Char.IsUpper(input[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
