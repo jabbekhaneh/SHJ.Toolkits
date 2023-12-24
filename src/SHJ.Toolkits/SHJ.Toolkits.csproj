@@ -5,12 +5,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<AssemblyName>SHJ.Toolkits</AssemblyName>
+	<Authors>Seyed Hasan Jabbekhaneh</Authors>
+	<PackageProjectUrl>https://github.com/jabbekhaneh/SHJ.Toolkits</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/jabbekhaneh/SHJ.Toolkits</RepositoryUrl>
+	<PackageReadmeFile>LICENSE.md</PackageReadmeFile>
+	<PackageTags>Collection,DateTimes,Enums,Linqs,Reflections,ValueObjects</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="System\IO\" />
     <Folder Include="ValueObjects\" />
   </ItemGroup>
+
+
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />

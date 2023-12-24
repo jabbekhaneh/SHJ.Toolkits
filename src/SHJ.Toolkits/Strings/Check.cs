@@ -3,9 +3,19 @@ using SHJ.Toolkits.System;
 
 namespace SHJ.Toolkits.Strings;
 
-
+/// <summary>
+/// 
+/// </summary>
 public static class Check
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="value"></param>
+    /// <param name="parameterName"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     [ContractAnnotation("value:null => halt")]
     public static T NotNull<T>(
        T? value,
@@ -18,7 +28,15 @@ public static class Check
 
         return value;
     }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="value"></param>
+    /// <param name="parameterName"></param>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
     [ContractAnnotation("value:null => halt")]
     public static T NotNull<T>(
         T? value,
