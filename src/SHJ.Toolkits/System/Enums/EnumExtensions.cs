@@ -1,22 +1,14 @@
-﻿using SHJ.Toolkits.Strings;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
-namespace SHJ.Toolkits.Enums;
+namespace System;
 
 public static class EnumExtensions
 {
     /// <summary>
-    /// برای دریافت توضیحات یک ویژگی از enum اگر [Description] داشته باشد از این متد استفاده می‌شود.
+    /// This method is used to get the description of an attribute from enum if it has [Description].
     /// </summary>
-    /// <param name="enumValue">مقداری که قرار است توضحیات آن دریافت شود</param>
-    /// <returns>متن داخل [Description] در صورتی که وجود داشته باشد و در غیراین صورت عنوان enums ارسال شده</returns>
+    /// <param name="enumValue">Amount for which explanations are to be received</param>
+    /// <returns>The text inside [Description] if it exists and otherwise the title of enums is sent</returns>
     public static string GetEnumDescription(this Enum enumValue)
     {
         var memberInfo = enumValue.GetType().GetField(enumValue.ToString());
@@ -44,6 +36,6 @@ public static class EnumExtensions
                 yield return (T)value;
     }
 
-   
+
 }
 

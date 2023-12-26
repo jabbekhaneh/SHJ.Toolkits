@@ -1,10 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Dynamic;
 
-namespace SHJ.Toolkits.Collection;
-/// <summary>
-/// Extension methods for Dictionary.
-/// </summary>
+namespace System.Collection;
+
 public static class AbpDictionaryExtensions
 {
     /// <summary>

@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
-using SHJ.Toolkits.Strings;
 
-namespace SHJ.Toolkits.Collection;
+namespace System.Collection;
 
 public static class CollectionExtensions
 {

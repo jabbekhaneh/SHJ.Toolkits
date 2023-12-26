@@ -1,4 +1,5 @@
-﻿namespace SHJ.Toolkits.DateTimes;
+﻿
+namespace System;
 public static class DateTimeExtensions
 {
     public static long ToUnixTimeMillisecond(this DateTime dateTime, TimeZoneInfo timeZoneInfo)

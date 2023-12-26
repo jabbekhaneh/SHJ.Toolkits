@@ -2,13 +2,13 @@
 using System.Diagnostics;
 using System.Reflection;
 
-namespace SHJ.Toolkits.Reflections;
+namespace System.Reflections;
 
 public static class ReflectionHelper
 {
     public static bool HasAttribute<T>(this MemberInfo type, bool inherit = false) where T : Attribute
     {
-        return HasAttribute(type, typeof(T), inherit);
+        return type.HasAttribute(typeof(T), inherit);
     }
 
     public static bool HasAttribute(this MemberInfo type, Type attribute, bool inherit = false)
@@ -18,7 +18,7 @@ public static class ReflectionHelper
 
     public static bool IsInheritFrom<T>(this Type type)
     {
-        return IsInheritFrom(type, typeof(T));
+        return type.IsInheritFrom(typeof(T));
     }
 
     public static bool IsInheritFrom(this Type type, Type parentType)
@@ -64,7 +64,7 @@ public static class ReflectionHelper
 
     public static IEnumerable<Type> GetBaseTypesAndInterfaces(this Type type)
     {
-        if ((type == null) || (type.BaseType == null))
+        if (type == null || type.BaseType == null)
             yield break;
 
         foreach (var i in type.GetInterfaces())

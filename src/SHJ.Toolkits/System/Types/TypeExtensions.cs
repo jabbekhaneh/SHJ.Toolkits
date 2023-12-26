@@ -1,8 +1,6 @@
-﻿using SHJ.Toolkits.Strings;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 
-namespace SHJ.Toolkits.System;
-
+namespace System;
 
 public static class TypeExtensions
 {

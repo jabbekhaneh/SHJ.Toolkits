@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SHJ.Toolkits.Collection;
+﻿namespace System.Collection;
 
 
-/// <summary> 
-/// Extension methods for <see cref="IEnumerable{T}"/>.
-/// </summary>
+
 public static class AbpEnumerableExtensions
 {
     /// <summary>

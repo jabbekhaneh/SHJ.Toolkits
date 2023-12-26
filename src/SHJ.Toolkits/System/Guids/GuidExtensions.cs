@@ -1,5 +1,4 @@
-﻿namespace SHJ.Toolkits.Guids;
-
+﻿namespace System;
 
 public static class GuidExtensions
 {

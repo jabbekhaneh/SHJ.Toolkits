@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
-using SHJ.Toolkits.Strings;
 
-namespace SHJ.Toolkits.Collection;
+namespace System.Collection;
 
 /// <summary>
 /// Extension methods for <see cref="IList{T}"/>.

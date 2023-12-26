@@ -1,11 +1,11 @@
 ﻿using JetBrains.Annotations;
-using SHJ.Toolkits.Collection;
+using System.Collection;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SHJ.Toolkits.Strings;
+namespace System;
 
 /// <summary>
 /// Extension methods for String class.
@@ -103,7 +103,7 @@ public static class StringExtensions
                 continue;
             }
 
-            if ((++count) == n)
+            if (++count == n)
             {
                 return i;
             }
@@ -523,7 +523,7 @@ public static class StringExtensions
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="str"/> is null</exception>
     public static string? TruncateWithPostfix(this string? str, int maxLength)
     {
-        return TruncateWithPostfix(str, maxLength, "...");
+        return str.TruncateWithPostfix(maxLength, "...");
     }
 
     /// <summary>
@@ -581,7 +581,7 @@ public static class StringExtensions
     {
         for (int i = 0; i < input.Length; i++)
         {
-            if (Char.IsLetter(input[i]) && !Char.IsUpper(input[i]))
+            if (char.IsLetter(input[i]) && !char.IsUpper(input[i]))
             {
                 return false;
             }

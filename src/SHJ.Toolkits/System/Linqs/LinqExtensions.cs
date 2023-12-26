@@ -1,9 +1,7 @@
-﻿using SHJ.Toolkits.Strings;
-using System.Data;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using JetBrains.Annotations;
 
-namespace SHJ.Toolkits.Linqs;
+namespace System.Linq;
 
 
 /// <summary>
@@ -98,5 +96,5 @@ public static class QueryableExtensions
             : query;
     }
 
-   
+
 }
