@@ -589,4 +589,13 @@ public static class StringExtensions
 
         return true;
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public static string StripHTML(string input)
+    {
+        return Regex.Replace(input, "<.*?>", String.Empty);
+    }
 }
